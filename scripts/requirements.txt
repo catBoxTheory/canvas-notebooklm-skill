@@ -1,0 +1,5 @@
+canvasapi>=3.2.0
+notebooklm-py>=0.3.4
+pyyaml>=6.0
+python-dotenv>=1.0.0
+requests>=2.31.0

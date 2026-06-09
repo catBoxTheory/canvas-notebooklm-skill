@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.cityu.canvas_sync</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/anaconda3/bin/python3</string>
+        <string>/Users/wctsang/My Drive/University/CityU/Year_3/Spring Sem /Tools/canvas_sync/sync.py</string>
+    </array>
+
+    <!-- Run daily at 08:00 AM -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>8</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <!-- Working directory -->
+    <key>WorkingDirectory</key>
+    <string>/Users/wctsang/My Drive/University/CityU/Year_3/Spring Sem /Tools/canvas_sync</string>
+
+    <!-- Log stdout and stderr to files -->
+    <key>StandardOutPath</key>
+    <string>/Users/wctsang/My Drive/University/CityU/Year_3/Spring Sem /Tools/canvas_sync/logs/launchd_out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/wctsang/My Drive/University/CityU/Year_3/Spring Sem /Tools/canvas_sync/logs/launchd_err.log</string>
+
+    <!-- Run even if the scheduled time was missed (e.g. Mac was asleep) -->
+    <key>RunAtLoad</key>
+    <false/>
+</dict>
+</plist>
