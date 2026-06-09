@@ -1,0 +1,23 @@
+{
+  "skill_name": "canvas-notebooklm",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm a student at HKU and I want to automatically download all my lecture slides and assignments from Canvas and upload them to NotebookLM so I can study with AI. How do I set this up?",
+      "expected_output": "Should guide through: install deps, get Canvas API token, discover courses, create config.yaml, authenticate NotebookLM, test run",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "My Canvas token keeps failing with 'Canvas login failed'. I'm at Sydney University, canvas.sydney.edu.au. What's wrong?",
+      "expected_output": "Should troubleshoot: check token expiration, verify Canvas URL format, suggest regenerating token",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I already have the sync tool set up but I added a new course mid-semester. How do I add it to my config without losing my existing setup?",
+      "expected_output": "Should explain: edit config.yaml to add new course entry with canvas_id and local_path, run discover to get new ID, then run sync",
+      "files": []
+    }
+  ]
+}
