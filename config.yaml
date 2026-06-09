@@ -1,0 +1,39 @@
+canvas:
+  url: https://canvas.cityu.edu.hk
+  # Token is loaded from the CANVAS_TOKEN environment variable in .env
+
+courses:
+  CS3402:
+    canvas_id: 67394
+    local_path: "/Users/wctsang/My Drive/University/CityU/Year_3/Spring Sem /CS3402"
+  SDSC2004:
+    canvas_id: 67695
+    local_path: "/Users/wctsang/My Drive/University/CityU/Year_3/Spring Sem /SDSC2004"
+  SDSC2005:
+    canvas_id: 68763
+    local_path: "/Users/wctsang/My Drive/University/CityU/Year_3/Spring Sem /SDSC2005"
+  SDSC2102:
+    canvas_id: 68768
+    local_path: "/Users/wctsang/My Drive/University/CityU/Year_3/Spring Sem /SDSC2102"
+
+# Only files with these extensions will be downloaded
+file_types:
+  - .pdf
+  - .pptx
+  - .ppt
+  - .docx
+  - .doc
+  - .xlsx
+  - .xls
+  - .sql
+  - .ipynb
+  - .csv
+  - .zip
+
+notebooklm:
+  enabled: true
+  # Each course gets its own NotebookLM notebook named "CityU - <COURSE>"
+  notebook_prefix: "CityU"
+
+schedule:
+  time: "08:00"   # Daily sync at 8:00 AM
