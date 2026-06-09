@@ -1,101 +1,191 @@
 # Canvas → NotebookLM Auto-Sync
 
-自動從 CityU Canvas 下載課程檔案，整理到本地資料夾，並同步上傳至 NotebookLM。
+Automatically download course materials from any Canvas LMS and upload them to Google NotebookLM for AI-powered studying. Works with any university that uses Canvas.
 
-## 支援課程
+## What It Does
 
-- CS3402
-- SDSC2004
-- SDSC2005
-- SDSC2102
+1. Connects to your university's Canvas via API token
+2. Discovers your enrolled courses
+3. Downloads lecture slides, assignments, and files into organized `Lesson_NN/` folders
+4. Uploads everything to Google NotebookLM — one notebook per course
+5. Tracks state so it never re-downloads or re-uploads duplicates
 
----
+## Prerequisites
 
-## 首次設定步驟
+- Python 3.10+
+- A Canvas LMS account (any university)
+- A Google account (for NotebookLM)
 
-### 1. 安裝依賴套件
+## Quick Start
+
+### 1. Install Dependencies
 
 ```bash
-cd "/Users/wctsang/My Drive/University/CityU/Year_3/Spring Sem /Tools/canvas_sync"
 pip install -r requirements.txt
 ```
 
-### 2. 設定 Canvas API Token
+### 2. Get Your Canvas API Token
 
-前往 [canvas.cityu.edu.hk](https://canvas.cityu.edu.hk) → **Account** → **Settings** → **New Access Token**，複製 token。
+1. Log in to your university's Canvas portal
+2. Go to **Account** → **Settings** → **New Access Token**
+3. Give it a name (e.g., "notebooklm-sync") and copy the token
 
 ```bash
 cp .env.example .env
-# 用文字編輯器打開 .env，把 token 填進去
+# Open .env and paste your token
 ```
 
-### 3. 找出各課程的 Canvas ID
+### 3. Discover Your Courses
 
 ```bash
 python discover_courses.py
 ```
 
-輸出範例：
+This lists all your enrolled courses with their IDs:
+
 ```
 ID           Course Code     Course Name
 ----------------------------------------------------------------------
-12345        CS3402-T01      Database Systems
-12346        SDSC2004-T02    Data Visualization
+12345        CS101           Introduction to Computer Science
+12346        MATH201         Linear Algebra
 ```
 
-把對應的 ID 填入 `config.yaml` 的 `canvas_id` 欄位。
+### 4. Configure Your Courses
 
-### 4. 設定 NotebookLM 登入（只需一次）
+Edit `config.yaml` — add your Canvas URL and the courses you want to sync:
+
+```yaml
+canvas:
+  url: https://canvas.youruniversity.edu  # Your Canvas URL
+
+courses:
+  CS101:
+    canvas_id: 12345                       # From Step 3
+    local_path: ~/Documents/University/CS101
+  MATH201:
+    canvas_id: 12346
+    local_path: ~/Documents/University/MATH201
+
+file_types:
+  - .pdf
+  - .pptx
+  - .docx
+  - .ipynb
+  - .xlsx
+  - .csv
+
+notebooklm:
+  enabled: true
+  notebook_prefix: "University"  # Notebooks named "University - CS101"
+```
+
+### 5. Authenticate NotebookLM (One-Time)
 
 ```bash
 notebooklm auth
 ```
 
-按照指示用瀏覽器登入 Google 帳號，儲存 cookies。
+Opens a browser for Google login. Cookies are saved for future runs.
 
-### 5. 手動測試執行
+### 6. Test Run
+
+```bash
+python sync.py --download-only
+```
+
+Verify files downloaded correctly, then run the full sync:
 
 ```bash
 python sync.py
 ```
 
-確認下載和上傳都正常後，才設定排程。
+---
 
-### 6. 啟用每日自動排程（每天早上 8:00）
+## Daily Usage
+
+| Command | Description |
+|---------|-------------|
+| `python sync.py` | Full sync (download + upload) |
+| `python sync.py --download-only` | Download from Canvas only |
+| `python sync.py --upload-only` | Upload existing files to NotebookLM |
+
+---
+
+## How Files Are Organized
+
+Downloaded files go into a smart folder structure:
+
+```
+CourseFolder/
+├── Lesson_01/
+│   ├── lecture/       ← slides, lecture PDFs
+│   ├── lab/           ← tutorials, practicals
+│   ├── assignment/    ← homework, projects
+│   └── other/         ← everything else
+├── Lesson_02/
+│   └── ...
+└── new_files/         ← unmatched files
+```
+
+The tool automatically extracts lesson numbers from filenames (`lec01`, `Lecture 5`, `tutorial_12`, etc.) and categorizes files by Canvas folder type.
+
+---
+
+## Scheduling (macOS)
+
+To sync daily at 8 AM:
 
 ```bash
 cp com.cityu.canvas_sync.plist ~/Library/LaunchAgents/
+# Edit the plist to point to your sync.py path, then:
 launchctl load ~/Library/LaunchAgents/com.cityu.canvas_sync.plist
 ```
 
----
-
-## 日常使用
-
-| 指令 | 說明 |
-|------|------|
-| `python sync.py` | 完整同步（下載 + 上傳） |
-| `python sync.py --download-only` | 只從 Canvas 下載 |
-| `python sync.py --upload-only` | 只上傳到 NotebookLM |
-
----
-
-## 檔案說明
-
-| 檔案 | 說明 |
-|------|------|
-| `sync.py` | 主程式入口 |
-| `canvas_downloader.py` | Canvas 下載邏輯 |
-| `notebooklm_uploader.py` | NotebookLM 上傳邏輯 |
-| `discover_courses.py` | 查詢 Canvas 課程 ID |
-| `config.yaml` | 所有設定（課程、路徑、排程） |
-| `state.json` | 自動生成：記錄已下載/上傳的檔案 |
-| `logs/` | 每日 log 檔案 |
-
----
-
-## 停用排程
+To stop:
 
 ```bash
 launchctl unload ~/Library/LaunchAgents/com.cityu.canvas_sync.plist
 ```
+
+---
+
+## File Reference
+
+| File | Purpose |
+|------|---------|
+| `sync.py` | Main entry point |
+| `canvas_downloader.py` | Canvas download logic |
+| `notebooklm_uploader.py` | NotebookLM upload logic |
+| `discover_courses.py` | List enrolled courses with IDs |
+| `setup_wizard.py` | Interactive setup for new users |
+| `config.yaml` | Configuration (courses, paths, settings) |
+| `state.json` | Auto-generated: tracks downloaded/uploaded files |
+| `logs/` | Daily log files |
+
+---
+
+## Troubleshooting
+
+| Error | Fix |
+|-------|-----|
+| `CANVAS_TOKEN not set` | Check `.env` file exists with your token |
+| `Canvas login failed` | Token expired — generate a new one in Canvas Settings |
+| `NotebookLM login failed` | Run `notebooklm auth` again |
+| Files not downloading | Check `file_types` in config.yaml, verify course IDs |
+| Upload skipped (unsupported) | NotebookLM doesn't accept XLSX/CSV — download only |
+
+---
+
+## Tips
+
+- Run `python discover_courses.py` at the start of each semester for new course IDs
+- Delete `state.json` to force a full re-sync
+- Logs are in `logs/sync_YYYY-MM-DD.log` for debugging
+- The tool is idempotent — safe to run multiple times
+- NotebookLM supports: PDF, TXT, MD, DOCX, PPTX, EPUB, HTML
+
+---
+
+## License
+
+MIT
